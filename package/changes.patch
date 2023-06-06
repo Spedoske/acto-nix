@@ -1,0 +1,49 @@
+diff --git a/acto/checker/checker.py b/acto/checker/checker.py
+index 0a4e684..f08618b 100644
+--- a/acto/checker/checker.py
++++ b/acto/checker/checker.py
+@@ -1,5 +1,5 @@
+ import copy
+-import importlib
++import importlib.util
+ import logging
+ import operator
+ import os
+@@ -1104,7 +1104,7 @@ if __name__ == "__main__":
+ 
+             input_model = InputModel(context['crd']['body'], [], config.example_dir, 1, 1, [])
+ 
+-            module = importlib.import_module(config.k8s_fields)
++            module = importlib.util.spec_from_file_location(config.k8s_fields, os.path.join(args.config,config.k8s_fields[5:].replace('.', os.path.sep)))
+ 
+             for k8s_field in module.WHITEBOX:
+                 input_model.apply_k8s_schema(k8s_field)
+diff --git a/acto/input/input.py b/acto/input/input.py
+index bcc634f..f244c91 100644
+--- a/acto/input/input.py
++++ b/acto/input/input.py
+@@ -892,7 +892,7 @@ class DeterministicInputModel(InputModel):
+ 
+ if __name__ == '__main__':
+     import argparse
+-    import importlib
++    import importlib.util
+     import os
+     import time
+     from datetime import datetime
+@@ -923,13 +923,13 @@ if __name__ == '__main__':
+     input_model: InputModel = InputModel(context['crd']['body'], [], config.example_dir, 1, 1, [])
+     if args.blackbox:
+         pruned_list = []
+-        module = importlib.import_module(config.blackbox_custom_fields)
++        module = importlib.util.spec_from_file_location(config.blackbox_custom_fields, os.path.join(args.config,config.blackbox_custom_fields[5:].replace('.', os.path.sep)))
+         for custom_field in module.custom_fields:
+             pruned_list.append(custom_field.path)
+             input_model.apply_custom_field(custom_field)
+     else:
+         pruned_list = []
+-        module = importlib.import_module(config.custom_fields)
++        module = importlib.util.spec_from_file_location(config.custom_fields, os.path.join(args.config,config.custom_fields[5:].replace('.', os.path.sep)))
+         for custom_field in module.custom_fields:
+             pruned_list.append(custom_field.path)
+             input_model.apply_custom_field(custom_field)
